@@ -15,9 +15,6 @@ class Detail extends Component {
         this.props.dispatchDeleteFavorite(movie)
     }
     incrementCount(movie) {
-        //if(this.state.found)
-        //    this.props.decrement(movie)
-        //else
         this.props.dispatchAddFavorite({
             item: movie,
         });
@@ -40,9 +37,8 @@ class Detail extends Component {
                 <TouchableNativeFeedback onPress={this.add}>
                     <Text>{this.props.count}</Text>
                 </TouchableNativeFeedback>
-                <Text>Favorite Number {this.props.Favorite.length} {f} </Text>
                 {f>-1?
-                    <TouchableOpacity onPress={() => this.incrementCount(this.props.route.params.movie)}>
+                    <TouchableOpacity onPress={() => this.decrementCount(this.props.route.params.movie)}>
                         <Text style={styles.addFavorite}>Remove from favorite
                     </Text>
 
@@ -88,8 +84,7 @@ const styles=StyleSheet.create({
     },
     overviewText:
     {
-        lineHeight: 20,
-        letterSpacing: 2
+
     },
     image: {
         justifyContent: 'center',

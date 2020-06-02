@@ -13,7 +13,7 @@ export default function peopleReducer(state=initialState, action) {
             };
         case DELETE_Favorite:
             return {
-                Favorite: state.Favorite.filter(p => p.id!==action.movie.id),
+                Favorite: state.Favorite.filter(p => p.item.id!==action.movie.id),
             };
         default:
             return state;

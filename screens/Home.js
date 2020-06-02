@@ -147,7 +147,7 @@ class Home extends Component {
         return (
             <View>
                 <View>
-                    <Text>Welcome {this.state.googleUser.user.givenName}</Text>
+                    <Text>Welcome {this.state.googleUser? this.state.googleUser.user.givenName:''}</Text>
                     <Image
                         source={{uri: this.state.googleUser.user.photo}}
                         style={{width: 80, height: 80, borderRadius: 80/2}}
@@ -166,6 +166,7 @@ class Home extends Component {
         fetch('https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token='+token)
             .then((response) => response.json())
             .then((json) => {
+                alert(JSON.stringify(json))
                 // Some user object has been set up somewhere, build that user here
                 user.name=json.name
                 user.id=json.id
@@ -211,7 +212,7 @@ class Home extends Component {
                                 } else {
                                     AccessToken.getCurrentAccessToken().then(
                                         (data) => {
-                                            console.log('token')
+                                            alert('token');
                                             console.log(data.accessToken.toString())
                                             this.initUser(data.accessToken.toString())
                                         }
