@@ -1,12 +1,9 @@
 import React, {Component} from 'react';
 import {Alert, StyleSheet, Text, TouchableHighlight, View, Button, TouchableOpacity, Image} from 'react-native';
 import {LoginButton, ShareDialog, AccessToken} from 'react-native-fbsdk';
-import {increment, decrement} from '../actions/index.js';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
+
 import {
     GoogleSignin,
-    GoogleSigninButton,
     statusCodes,
 } from '@react-native-community/google-signin';
 const SHARE_LINK_CONTENT={
@@ -19,7 +16,7 @@ class Home extends Component {
         GoogleSignin.configure();
 
         super(props);
-        this.state={isSigninInProgress: false, googleReady: false, facebookReady: false, connect: false}
+        this.state={isSigninInProgress: false, googleReady: false, facebookReady: false, connect: false, name: '', facebookLogin: false}
     }
     componentDidMount() {
         this.googleCheck();
@@ -67,12 +64,10 @@ class Home extends Component {
     };
     googleCheck=async () => {
         const isSignedIn=await GoogleSignin.isSignedIn();
-        const currentUser=await GoogleSignin.getCurrentUser();
-        console.log('isSignedIn'+isSignedIn);
-        console.log(currentUser);
-        let c=false;
-        if(isSignedIn) c=true
-        this.setState({googleUser: currentUser, googleReady: true, googleSign: isSignedIn, connect: true});
+        if(isSignedIn) {
+            const currentUser=await GoogleSignin.getCurrentUser();
+            this.setState({googleUser: currentUser, googleReady: true, googleSign: isSignedIn, name: currentUser.user.givenName});
+        }
 
     }
     signOut=async () => {
@@ -95,11 +90,10 @@ class Home extends Component {
     };
 
     signIn=async () => {
-        console.log('sign in')
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo=await GoogleSignin.signIn();
-            this.setState({userInfo, googleSign: true});
+            this.setState({userInfo, googleSign: true, name: userInfo.user.givenName});
         } catch(error) {
 
             if(error.code===statusCodes.SIGN_IN_CANCELLED) {
@@ -124,14 +118,11 @@ class Home extends Component {
     notLogin=() => {
         return (<View>
 
-            <View><Text style={{fontSize: 20}}>Welcome Stranger</Text></View>
-            <View style={{
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
+            <View style={styles.welcomeView}><Text style={styles.welcomeText}>Welcome Stranger</Text></View>
+            <View style={styles.imageViewUser}>
                 <Image
                     source={require('./../images/nologin1.png')}
-                    style={{width: 80, height: 80, borderRadius: 80/2}}
+                    style={styles.imageUser}
                 />
 
             </View>
@@ -147,11 +138,13 @@ class Home extends Component {
         return (
             <View>
                 <View>
-                    <Text>Welcome {this.state.googleUser? this.state.googleUser.user.givenName:''}</Text>
-                    <Image
-                        source={this.state.googleUser? {uri: this.state.googleUser.user.photo}:require('./../images/nologin1.png')}
-                        style={{width: 80, height: 80, borderRadius: 80/2}}
-                    />
+                    <View style={styles.welcomeView}><Text style={styles.welcomeText}>Welcome {this.state.name}</Text></View>
+                    <View style={styles.imageViewUser}>
+                        <Image
+                            source={this.state.googleUser&&this.state.googleUser.user&&this.state.googleUser.user.photo? {uri: this.state.googleUser.user.photo}:require('./../images/nologin1.png')}
+                            style={styles.imageUser}
+                        />
+                    </View>
                 </View>
                 <TouchableOpacity onPress={this.gotoList}>
                     <View style={{backgroundColor: '#dddddd', width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center'}}>
@@ -166,7 +159,7 @@ class Home extends Component {
         fetch('https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token='+token)
             .then((response) => response.json())
             .then((json) => {
-                alert(JSON.stringify(json))
+                this.setState({name: json.name, facebookLogin: true})
                 // Some user object has been set up somewhere, build that user here
                 user.name=json.name
                 user.id=json.id
@@ -178,7 +171,7 @@ class Home extends Component {
                 user.avatar=setAvatar(json.id)
             })
             .catch(() => {
-                reject('ERROR GETTING DATA FROM FACEBOOK')
+                console.log('ERROR GETTING DATA FROM FACEBOOK')
             })
     }
     render() {
@@ -187,67 +180,42 @@ class Home extends Component {
         return (
             <View style={styles.container}>
 
+                <Image source={require('./../images/Movie.jpg')} />
+                {!this.state.googleSign&&!this.state.facebookLogin? this.notLogin():this.googleLogin()}
 
-                {!this.state.googleSign? this.notLogin():this.googleLogin()}
 
-                <View style={{
-                    flexDirection: 'row',
-                    position: 'absolute',
-                    bottom: 40,
-                    left: 20,
-
-                }}>
-                    <LoginButton
-                        publishPermissions={['publish_actions']}
-                        readPermissions={['public_profile']}
-                        onLoginFinished={
-                            (error, result) => {
-                                console.log('result')
-                                console.log(result)
-                                if(error) {
-                                    alert('fff')
-                                    console.log("login has error: "+result.error);
-                                } else if(result.isCancelled) {
-                                    console.log("login is cancelled.");
-                                } else {
-                                    AccessToken.getCurrentAccessToken().then(
-                                        (data) => {
-                                            alert('token');
-                                            console.log(data.accessToken.toString())
-                                            this.initUser(data.accessToken.toString())
-                                        }
-                                    )
-                                }
+                <LoginButton
+                    publishPermissions={['publish_actions']}
+                    readPermissions={['public_profile']}
+                    onLoginFinished={
+                        (error, result) => {
+                            console.log(result.name)
+                            if(error) {
+                                console.log("login has error: "+result.error);
+                            } else if(result.isCancelled) {
+                                console.log("login is cancelled.");
+                            } else {
+                                AccessToken.getCurrentAccessToken().then(
+                                    (data) => {
+                                        console.log(data.accessToken.toString())
+                                        this.initUser(data.accessToken.toString())
+                                    }
+                                )
                             }
                         }
-                        onLogoutFinished={() => console.log("logout.")} />
-                    {!this.state.googleSign?
-                        <TouchableOpacity onPress={this.signIn} style={{
-                            backgroundColor: '#ff0000', height: 32,
-                            borderBottomEndRadius: 5,
-                            borderBottomStartRadius: 5,
-                            borderTopEndRadius: 5,
-                            padding: 4,
-                            borderTopStartRadius: 5,
-                            marginLeft: 10,
-                        }}>
-                            <Text style={{color: '#ffffff'}}>
-                                Or With Google</Text>
-                        </TouchableOpacity>:
-                        <TouchableOpacity onPress={this.signOut} style={{
-                            backgroundColor: '#ff0000', height: 32,
-                            borderBottomEndRadius: 5,
-                            borderBottomStartRadius: 5,
-                            borderTopEndRadius: 5,
-                            padding: 4,
-                            borderTopStartRadius: 5,
-                            marginLeft: 10,
-                        }}>
-                            <Text style={{color: '#ffffff'}}>Log out from google</Text>
-                        </TouchableOpacity>
                     }
+                    onLogoutFinished={() => this.setState({name: '', facebookLogin: false})} />
+                {!this.state.googleSign?
+                    <TouchableOpacity onPress={this.signIn} style={styles.googleButton}>
+                        <Text style={{color: '#ffffff'}}>
+                            Or With Google</Text>
+                    </TouchableOpacity>:
+                    <TouchableOpacity onPress={this.signOut} style={styles.googleButton}>
+                        <Text style={{color: '#ffffff'}}>Log out</Text>
+                    </TouchableOpacity>
+                }
 
-                </View>
+
             </View>
         );
     }
@@ -259,10 +227,49 @@ const styles=StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F5FCFF',
     },
+    googleButtonText:
+    {
+        color: '#ffffff',
+        textAlign: 'center'
+    },
+    googleButton:
+    {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ff0000',
+        height: 32,
+        borderBottomEndRadius: 5,
+        borderBottomStartRadius: 5,
+        borderTopEndRadius: 5,
+        padding: 2,
+        borderTopStartRadius: 5,
+        width: 200,
+        marginTop: 10,
+
+    },
+    welcomeView:
+    {
+        marginBottom: 10,
+    },
+    welcomeText:
+    {
+        fontSize: 20,
+    },
     shareText: {
         fontSize: 20,
         margin: 10,
     },
+    imageViewUser:
+    {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    imageUser:
+    {
+        width: 80,
+        height: 80,
+        borderRadius: 80/2
+    }
 });
 
 export default Home;
