@@ -149,7 +149,7 @@ class Home extends Component {
                 <View>
                     <Text>Welcome {this.state.googleUser? this.state.googleUser.user.givenName:''}</Text>
                     <Image
-                        source={{uri: this.state.googleUser.user.photo}}
+                        source={this.state.googleUser? {uri: this.state.googleUser.user.photo}:require('./../images/nologin1.png')}
                         style={{width: 80, height: 80, borderRadius: 80/2}}
                     />
                 </View>
