@@ -77,7 +77,6 @@ class Home extends Component {
 
     }
     signOut=async () => {
-        console.log('sign out')
         try {
             await GoogleSignin.revokeAccess();
             await GoogleSignin.signOut();
@@ -99,6 +98,7 @@ class Home extends Component {
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo=await GoogleSignin.signIn();
+            alert(JSON.stringify(userInfo))
             this.setState({userInfo, googleSign: true, name: userInfo.user.givenName});
         } catch(error) {
 
