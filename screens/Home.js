@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Alert, StyleSheet, Text, TouchableHighlight, View, Button, TouchableOpacity, Image} from 'react-native';
-import {LoginButton, ShareDialog} from 'react-native-fbsdk';
+import {LoginButton, ShareDialog, AccessToken} from 'react-native-fbsdk';
 import {increment, decrement} from '../actions/index.js';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -19,10 +19,9 @@ class Home extends Component {
         GoogleSignin.configure();
 
         super(props);
-        this.state={isSigninInProgress: false, googleReady: false}
+        this.state={isSigninInProgress: false, googleReady: false, facebookReady: false, connect: false}
     }
     componentDidMount() {
-        console.log('Update')
         this.googleCheck();
 
     }
@@ -71,7 +70,9 @@ class Home extends Component {
         const currentUser=await GoogleSignin.getCurrentUser();
         console.log('isSignedIn'+isSignedIn);
         console.log(currentUser);
-        this.setState({googleUser: currentUser, googleReady: true, googleSign: isSignedIn});
+        let c=false;
+        if(isSignedIn) c=true
+        this.setState({googleUser: currentUser, googleReady: true, googleSign: isSignedIn, connect: true});
 
     }
     signOut=async () => {
@@ -177,11 +178,24 @@ class Home extends Component {
                     left: 20,
 
                 }}>
-                    <LoginButton onPress={this._shareLinkWithShareDialog}
-                        onLoginFinished={(error, data) => {
-                            Alert.alert(JSON.stringify(error||data, null, 2));
-                        }}
-                    />
+                    <LoginButton
+                        onLoginFinished={
+                            (error, result) => {
+                                alert('fff')
+                                if(error) {
+                                    console.log("login has error: "+result.error);
+                                } else if(result.isCancelled) {
+                                    console.log("login is cancelled.");
+                                } else {
+                                    AccessToken.getCurrentAccessToken().then(
+                                        (data) => {
+                                            console.log(data.accessToken.toString())
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                        onLogoutFinished={() => console.log("logout.")} />
                     {!this.state.googleSign?
                         <TouchableOpacity onPress={this.signIn} style={{
                             backgroundColor: '#ff0000', height: 32,
