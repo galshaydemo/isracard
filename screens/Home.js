@@ -147,8 +147,8 @@ class Home extends Component {
                     </View>
                 </View>
                 <TouchableOpacity onPress={this.gotoList}>
-                    <View style={{backgroundColor: '#dddddd', width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center'}}>
-                        <Text >רשימת סרטים</Text>
+                    <View style={styles.buttonList}>
+                        <Text style={styles.buttonListText} >רשימת סרטים</Text>
                     </View>
                 </TouchableOpacity>
 
@@ -269,6 +269,25 @@ const styles=StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 80/2
+    },
+    buttonListText:
+    {
+        fontWeight: 'bold',
+        fontSize: 20,
+    },
+    buttonList:
+    {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#20dd20',
+        width: 120,
+        height: 60,
+        borderRadius: 60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 10,
+        marginBottom: 10,
+
     }
 });
 
