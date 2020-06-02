@@ -1,0 +1,16 @@
+{
+    "idToken": null,
+    "scopes": [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email"
+    ],
+    "serverAuthCode": null,
+    "user": {
+        "email": "galshay24@gmail.com",
+        "familyName": "שי",
+        "givenName": "Gal Shay",
+        "id": "104736669298036142862",
+        "name": "Gal Shay שי",
+        "photo": "https://lh3.googleusercontent.com/a-/AOh14GgraIk__NMDZvdfGHfJ7Er-Y4ehyOj0ptpmh4fPsA"
+    }
+}
