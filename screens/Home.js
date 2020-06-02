@@ -20,6 +20,12 @@ class Home extends Component {
     }
     componentDidMount() {
         this.googleCheck();
+        AccessToken.getCurrentAccessToken().then(
+            (data) => {
+                if(data!=null)
+                    this.initUser(data.accessToken.toString())
+            } //Refresh it every time
+        );
 
     }
 
