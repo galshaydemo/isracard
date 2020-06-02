@@ -162,6 +162,24 @@ class Home extends Component {
             </View>)
 
     }
+    initUser(token) {
+        fetch('https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token='+token)
+            .then((response) => response.json())
+            .then((json) => {
+                // Some user object has been set up somewhere, build that user here
+                user.name=json.name
+                user.id=json.id
+                user.user_friends=json.friends
+                user.email=json.email
+                user.username=json.name
+                user.loading=false
+                user.loggedIn=true
+                user.avatar=setAvatar(json.id)
+            })
+            .catch(() => {
+                reject('ERROR GETTING DATA FROM FACEBOOK')
+            })
+    }
     render() {
 
         console.log(this.state.googleSign)
@@ -179,17 +197,23 @@ class Home extends Component {
 
                 }}>
                     <LoginButton
+                        publishPermissions={['publish_actions']}
+                        readPermissions={['public_profile']}
                         onLoginFinished={
                             (error, result) => {
-                                alert('fff')
+                                console.log('result')
+                                console.log(result)
                                 if(error) {
+                                    alert('fff')
                                     console.log("login has error: "+result.error);
                                 } else if(result.isCancelled) {
                                     console.log("login is cancelled.");
                                 } else {
                                     AccessToken.getCurrentAccessToken().then(
                                         (data) => {
+                                            console.log('token')
                                             console.log(data.accessToken.toString())
+                                            this.initUser(data.accessToken.toString())
                                         }
                                     )
                                 }
