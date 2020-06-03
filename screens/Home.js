@@ -13,7 +13,7 @@ const SHARE_LINK_CONTENT={
 
 class Home extends Component {
     constructor(props) {
-        GoogleSignin.configure();
+        GoogleSignin.configure({scopes: ['https://www.googleapis.com/auth/userinfo.profile']});
 
         super(props);
         this.state={isSigninInProgress: false, googleReady: false, facebookReady: false, connect: false, name: '', facebookLogin: false}
@@ -72,6 +72,7 @@ class Home extends Component {
         const isSignedIn=await GoogleSignin.isSignedIn();
         if(isSignedIn) {
             const currentUser=await GoogleSignin.getCurrentUser();
+            console.log(currentUser)
             this.setState({googleUser: currentUser, googleReady: true, googleSign: isSignedIn, name: currentUser.user.givenName});
         }
 
