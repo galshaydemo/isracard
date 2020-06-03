@@ -31,8 +31,16 @@ import allReducers from './reducers/index.js';
 import ListMovie from './screens/ListMovie';
 import Home from './screens/Home';
 import Detail from './screens/Detail';
+import {persistStore, persistReducer} from 'redux-persist'
+import storage from '@react-native-community/async-storage';
+const persistConfig={
+  key: 'root',
+  storage: storage,
+}
+const persistedReducer=persistReducer(persistConfig, allReducers)
 const Stack=createStackNavigator();
-const store=createStore(allReducers);
+const store=createStore(persistedReducer);
+let persistor=persistStore(store)
 function NavStack() {
   return (
     <Stack.Navigator
@@ -53,9 +61,19 @@ function NavStack() {
         options={{title: 'Home'}}
       />
       <Stack.Screen
+
         name="Movies"
         component={ListMovie}
-        options={{title: 'Movies'}}
+        options={{
+          title: 'Movies',
+          headerRight: () => (
+            <Button
+              onPress={() => alert('This is a button!')}
+              title="Favorite"
+              color="#000000"
+            />
+          ),
+        }}
       />
       <Stack.Screen
         name="Detail"

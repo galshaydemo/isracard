@@ -20,9 +20,6 @@ class Detail extends Component {
         });
 
     }
-    add=() => {
-        alert('add');
-    }
     render() {
         //const f=this.props.find(this.props.route.params.movie)
         const f=this.props.Favorite.findIndex(k => k.item.id==this.props.route.params.movie.id);
@@ -34,9 +31,6 @@ class Detail extends Component {
                 <View style={styles.image}><Image style={{height: 330, width: 220}} source={{uri: x}}></Image></View>
                 <View style={styles.overview}><Text style={styles.overviewText}>{this.props.route.params.movie.overview}</Text></View>
                 <View style={styles.rankView}><View style={styles.rankTextView}><Text style={styles.rankText}>Rank:</Text></View><Text>{this.props.route.params.movie.vote_average}</Text></View>
-                <TouchableNativeFeedback onPress={this.add}>
-                    <Text>{this.props.count}</Text>
-                </TouchableNativeFeedback>
                 {f>-1?
                     <TouchableOpacity onPress={() => this.decrementCount(this.props.route.params.movie)}>
                         <Text style={styles.addFavorite}>Remove from favorite

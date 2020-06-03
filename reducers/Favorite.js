@@ -3,8 +3,8 @@ import {ADD_Favorite, DELETE_Favorite} from '../constant';
 
 const initialState={Favorite: []}
 
-export default function peopleReducer(state=initialState, action) {
-    console.log(action.movie)
+export default function favoriteReducer(state=initialState, action) {
+
     switch(action.type) {
 
         case ADD_Favorite:

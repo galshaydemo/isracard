@@ -1,12 +1,17 @@
 import React, {Component} from 'react';
-import {Dimensions, FlatList, View, Text, StyleSheet} from "react-native";
+import {Dimensions, FlatList, Button, View, Text, StyleSheet, Modal, TouchableHighlight} from "react-native";
 import {TouchableOpacity} from 'react-native-gesture-handler';
-
+import {connect} from 'react-redux';
 class ListMovie extends Component {
     constructor(props) {
         super(props);
+        this.props.navigation.setOptions({
+            headerRight: () => (
+                <Button onPress={this.listFav} title="Favorite" />
+            ),
+        });
         this.onPress=this.onPress.bind(this)
-        this.state={data: [], ready: false};
+        this.state={data: [], ready: false, visible: false};
     }
     getMoviesFromApi=async () => {
 
@@ -37,19 +42,104 @@ class ListMovie extends Component {
             </TouchableOpacity>
         );
     }
+    favItem(movie, index) {
+
+        return (
+            <View style={{flexDirection: 'row-reverse'}}>
+                <View style={{paddingHorizontal: 5}}><Text >{index+1}</Text></View>
+                <View><Text style={{textAlign: 'left'}} >{movie.item.title}</Text></View>
+
+            </View>
+
+        );
+    }
+    listFav=() => {
+        this.setState({visible: true});
+    }
 
     render() {
+
         return (
-            <FlatList data={this.state.data} keyExtractor={"id"}
-                renderItem={({item}) => this.Item(item)}
-                numColumns={2}
-                keyExtractor={item => item.id}
-            ></FlatList>
+            <View>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.state.visible}
+                    onRequestClose={() => {
+                        Alert.alert("Modal has been closed.");
+                    }}
+                >
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <FlatList data={this.props.Favorite}
+                                renderItem={({item, index}) => this.favItem(item, index)}
+                                keyExtractor={(item, index) => item.item.id.toString()}
+
+                            >
+
+
+                            </FlatList>
+
+                            <TouchableHighlight
+                                style={{...styles.openButton, backgroundColor: "#2196F3"}}
+                                onPress={() => {
+                                    this.setState({visible: !this.state.visible});
+                                }}
+                            >
+                                <Text style={styles.textStyle}>Close</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                </Modal>
+
+                <FlatList data={this.state.data}
+                    renderItem={({item}) => this.Item(item)}
+                    numColumns={2}
+                    keyExtractor={item => item.id}
+                ></FlatList>
+            </View>
 
         );
     }
 }
 const styles=StyleSheet.create({
+    centeredView: {
+        flex: 0.6,
+        justifyContent: "center",
+        alignItems: "center",
+
+    },
+    modalView: {
+        margin: 10,
+        backgroundColor: "white",
+        borderRadius: 20,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5
+    },
+    openButton: {
+        backgroundColor: "#F194FF",
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+    },
+
     title: {
 
     },
@@ -69,5 +159,17 @@ const styles=StyleSheet.create({
     },
 });
 
+function mapStateToProps(state) {
 
-export default ListMovie;
+
+    return {
+        Favorite: state.Favorite.Favorite
+    };
+}
+function matchDispatchToProps(dispatch) {
+    return {
+        dispatchAddFavorite: (favorite) => dispatch(addFavorite(favorite)),
+        dispatchDeleteFavorite: (favorite) => dispatch(deleteFavorite(favorite))
+    }
+}
+export default connect(mapStateToProps, matchDispatchToProps)(ListMovie);

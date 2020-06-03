@@ -98,7 +98,7 @@ class Home extends Component {
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo=await GoogleSignin.signIn();
-             this.setState({userInfo, googleSign: true, name: userInfo.user.givenName});
+            this.setState({userInfo, googleSign: true, name: userInfo.user.givenName});
         } catch(error) {
 
             if(error.code===statusCodes.SIGN_IN_CANCELLED) {
@@ -181,7 +181,7 @@ class Home extends Component {
     }
     render() {
 
-        console.log(this.state.googleSign)
+
         return (
             <View style={styles.container}>
 
@@ -194,7 +194,6 @@ class Home extends Component {
                     readPermissions={['public_profile']}
                     onLoginFinished={
                         (error, result) => {
-                            console.log(result.name)
                             if(error) {
                                 console.log("login has error: "+result.error);
                             } else if(result.isCancelled) {
@@ -202,7 +201,6 @@ class Home extends Component {
                             } else {
                                 AccessToken.getCurrentAccessToken().then(
                                     (data) => {
-                                        console.log(data.accessToken.toString())
                                         this.initUser(data.accessToken.toString())
                                     }
                                 )
@@ -227,7 +225,7 @@ class Home extends Component {
 }
 const styles=StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 0.8,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F5FCFF',
@@ -285,7 +283,7 @@ const styles=StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#20dd20',
-        width: 120,
+        width: 200,
         height: 60,
         borderRadius: 60,
         alignItems: 'center',
