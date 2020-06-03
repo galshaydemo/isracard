@@ -98,8 +98,7 @@ class Home extends Component {
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo=await GoogleSignin.signIn();
-            alert(JSON.stringify(userInfo))
-            this.setState({userInfo, googleSign: true, name: userInfo.user.givenName});
+             this.setState({userInfo, googleSign: true, name: userInfo.user.givenName});
         } catch(error) {
 
             if(error.code===statusCodes.SIGN_IN_CANCELLED) {
